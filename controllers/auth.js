@@ -23,12 +23,6 @@ exports.signup = async (req, res, next) =>{
     const phoneNum = req.body.phoneNum;
     const hashedPw = await bcrypt.hash(password, 12)
 
-    const userEmail = await User.findOne({ email: email})
-    if (userEmail){
-        const error = new Error('Email already exists')
-        error.statusCode = 422;
-        throw error
-    }
     try {
             const user = new User({
                 firstname: firstname,
