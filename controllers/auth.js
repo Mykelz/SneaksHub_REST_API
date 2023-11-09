@@ -1,43 +1,102 @@
-const { validationResult } = require('express-validator');
+const User = require("../models/auth");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+require("dotenv").config();
 
-const User = require('../models/auth');
-const bcrypt = require('bcryptjs');
+const { validationResult } = require("express-validator");
 
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
+const mailgun = new Mailgun(formData);
+const client = mailgun.client({
+  username: "api",
+  key: process.env.MAILGUN_API_KEY || "your-key-here",
+  url: "https://api.mailgun.net",
+});
 
-exports.signup = async (req, res, next) =>{
-    const errors = validationResult(req);
-    if (!errors.isEmpty()){
-        const error = new Error('validation failed, entered data is incorrect');
-        error.statusCode = 422;
-        error.data = errors.array()
+exports.signup = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Invalid Credential");
+    error.data = errors.array();
+    error.statusCode = 422;
+    throw error;
+  }
+
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+  const phoneNum = req.body.phoneNum;
+
+  const token = crypto.randomBytes(6, (err, buffer) => {
+      if (err) {
+        const error = new Error("An error occured!");
         throw error;
-    }
+      }
+      const token = buffer.toString("hex");
 
-    
+      const messageData = {
+        from: "obianukamicheal@gmail.com",
+        to: email,
+        subject: "Email confirmation",
+        html: `<h2> You're almost there!</h2> <br> <p> Click this link to confirm your email and set up your account <a href='http://localhost:2020/auth/emailConf/${token}'>link</a></p>`,
+      };
 
-    const firstname = req.body.firstname;
-    const lastname = req.body.lastname;
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = req.body.password;
-    const phoneNum = req.body.phoneNum;
-    const hashedPw = await bcrypt.hash(password, 12)
-
-    try {
-            const user = new User({
-                firstname: firstname,
-                lastname: lastname,
-                username: username,
+      bcrypt.hash(password, 12).then((hashedPw) => {
+        const user = new User({
+          firstname: firstname,
+          lastname: lastname,
+          username: username,
+          email: email,
+          password: hashedPw,
+          phoneNum: phoneNum,
+          token: token,
+        });
+        user.save().then( result=>{
+            client.messages
+            .create(
+                "sandbox5385b2517fba48938a6d7f16dcba5349.mailgun.org", messageData)
+            .then((data) => {
+                res.status(200).json({
+                msg: `Click the link we sent to ${email} to complete your account set-up.`,
                 email: email,
-                password: hashedPw,
-                phoneNum: phoneNum
+                });
+            })
         })
-        const result = await user.save();
-        res.status(201).json({ message: 'User created successfully', userId: result._id})
-    } catch (err) {
-        if (!err.statusCode){
-            err.statusCode = 500
-        }
-        next(err)
-    }
+      })
+      .catch((err) => {
+        next(err);
+      });
+    })
+};
+
+
+exports.emailConf = (req, res, next) =>{
+    token = req.params.token;
+    User.findOne({ token: token})
+        .then(userDoc =>{
+            if (!userDoc){
+                const error = new Error('Please click the link sent to your email to verify your account, or proceed to login if you have verified your email already');
+                throw error;
+            }
+                userDoc.updateOne({ token: null, status: true}).then(result=>{
+                    const messageData = {
+                        from: "obianukamicheal@gmail.com",
+                        to: userDoc.email,
+                        subject: "Email confirmation",
+                        html: `<h2> Welcome Onboard, ${userDoc.username}!</h2> <br> <p> Your emali has now been verified, you can now proceed to login.</a></p>`,
+                      };
+                      client.messages
+                      .create(
+                          "sandbox5385b2517fba48938a6d7f16dcba5349.mailgun.org", messageData)
+                      .then((data) => {
+                        res.status(200).json({ msg: 'Email verified successfully, you can now proceed to login'})
+                      })
+                })
+        })
+        .catch(err=>{
+            next(err)
+        })
 }

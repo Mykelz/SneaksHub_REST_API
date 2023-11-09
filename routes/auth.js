@@ -8,16 +8,20 @@ const router = express.Router()
 
 
 router.post('/signup',[
-    body('firstname').trim().not().isEmpty().withMessage('please Enter your first name'),
-    body('lastname').trim().not().isEmpty().withMessage('please Enter your lastname'),
-    body('username').trim().not().isEmpty().withMessage('please Enter a username')
-        .custom((value, {req}) =>{
-            return User.findOne({ username: value}).then(userName =>{
-                if (userName){
-                    return Promise.reject('username already exists')
-                }
-            })
-        }),
+    body('firstname')
+    .trim().not().isEmpty().withMessage('please Enter your first name'),
+    body('lastname')
+    .trim().not().isEmpty().withMessage('please Enter your lastname'),
+    body('username')
+    .trim().not().isEmpty().withMessage('username is a required field')
+    .custom((value, {req}) =>{
+        return User.findOne({ username: value}).then(userDoc =>{
+            if (userDoc){
+                return Promise.reject('username is already in use!')
+            }
+        
+        })
+    }),
     body('email')
     .not().isEmpty().withMessage('Email is a required field')
     .isEmail()
@@ -30,13 +34,12 @@ router.post('/signup',[
         })
     })
     .normalizeEmail(),
-    body('password').trim().escape().isLength({min: 5}).withMessage('Please enter a stronger password'),
+    body('password').trim().escape().isLength({min: 7}).withMessage('Please enter a stronger password'),
     body('phoneNum').isMobilePhone('en-NG').withMessage('Please enter a valid phone number')
 
 
 
 ], authController.signup)
 
-
-
+router.get('/emailConf/:token', authController.emailConf )
 module.exports = router;
