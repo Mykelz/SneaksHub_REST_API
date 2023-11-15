@@ -15,13 +15,16 @@ ___
 * **Payments** - There would be a payment system that allows users to fund their virtual accounts/ wallets, The funded amount will be displayed in the users wallet after the payment has been confirmed. They can purchase any product of their choice and pay with the funded wallets ( As long as the amount in their wallet is enough to cover the price of the item they wish to purchase).
 * **Receipts Generator** - After every purchase a downloadable receipt would be generated containing all the details of the purchased item.
 * **Image Uploads** -Sellers can upload images if their products.
-* **JWT AUthentication** - Registered users will be authenticated using the jwt before they can be granted access to their accounts.
-* **EmailSending** - Emails will be sent out at different stages wehn using this API.
+* **JWT AUthentication** - Registered users will be authenticated using **jwt** before they can be granted access to their accounts.
+* **Email Sending** - Emails will be sent out at different stages wehn using this API using the mailgun API.
      * email confirmation - after registration a confirmation email with a unique link will be sent to the email provided during registration. The user is required to click the unique link to confirm their email.
-     * Welcome message - A welcome message will be sent out to users after they successfully confrim their email.
-     * Payments - An email will be sent upon successfull funding of wallets
-     * Successfully Purchased - An email containng the details of the transactions and recipts will be sent to a buyer after every purchase.
-     * Succesfull sale - An email will be sent to a seller upon making a succesfull sale.
+     * **Welcome message** - A welcome message will be sent out to users after they successfully confrim their email.
+     * **Payments** - An email will be sent upon successfull funding of wallets
+     * **Successfully Purchased** - An email containng the details of the transactions and recipts will be sent to a buyer after every purchase.
+     * **Successfull sale** - An email will be sent to a seller upon making a succesfull sale.
+
+___
+
 ### Getting Started
 
 
