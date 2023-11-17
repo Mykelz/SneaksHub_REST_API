@@ -2,6 +2,7 @@ const User = require("../models/auth");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 require("dotenv").config();
+const jwt = require('jsonwebtoken');
 
 const { validationResult } = require("express-validator");
 
@@ -66,9 +67,12 @@ exports.signup = (req, res, next) => {
             })
         })
       })
-      .catch((err) => {
-        next(err);
-      });
+      .catch(err=>{
+        if (!err.statusCode){
+          err.statusCode = 500;
+        }
+          next(err)
+      })
     })
 };
 
@@ -81,7 +85,7 @@ exports.emailConf = (req, res, next) =>{
                 const error = new Error('Please click the link sent to your email to verify your account, or proceed to login if you have verified your email already');
                 throw error;
             }
-                userDoc.updateOne({ token: null, status: true}).then(result=>{
+                userDoc.updateOne({ token: null, verified: true }).then(result=>{
                     const messageData = {
                         from: "obianukamicheal@gmail.com",
                         to: userDoc.email,
@@ -97,6 +101,51 @@ exports.emailConf = (req, res, next) =>{
                 })
         })
         .catch(err=>{
+          if (!err.statusCode){
+            err.statusCode = 500;
+          }
             next(err)
         })
 }
+
+
+exports.login = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser;
+
+  User.findOne({ email: email })
+    .then(user=>{
+      if (!user){
+        const error = new Error('No user is associated with this email');
+        error.statusCode = 401;
+        throw error;
+      }
+      if (user.verified === false){
+        const error = new Error('you need to verify your email before you can login')
+        error.statusCode = 401;
+        throw error;
+      }
+      loadedUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then(isEqual=>{
+      if (!isEqual){
+        const error = new Error('Wrong password')
+        error.statusCode = 500;
+        throw error;
+      }
+      const token = jwt.sign(
+        { email: loadedUser.email, userId: loadedUser._id},
+        'averytopsecretsecret',
+        { expiresIn: '1hr'}
+      );
+      res.status(200).json({ token: token, msg: 'you are logged in'})
+    })
+    .catch(err=>{
+      if (!err.statusCode){
+        err.statusCode = 500;
+      }
+      next(err)
+    })
+  }

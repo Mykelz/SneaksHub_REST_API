@@ -41,5 +41,10 @@ router.post('/signup',[
 
 ], authController.signup)
 
-router.get('/emailConf/:token', authController.emailConf )
+router.get('/emailConf/:token', authController.emailConf)
+
+router.post('/login', authController.login)
+
+
+
 module.exports = router;

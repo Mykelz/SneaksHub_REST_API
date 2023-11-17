@@ -27,21 +27,29 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    status: {
+    verified: {
         type: Boolean,
         default: false
     },
     token:{
         type: String,
     },
+    isShopOwner: {
+        type: Boolean,
+        default: false
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
     shop: [
     {
         type: Schema.Types.ObjectId,
-        ref: 'Shop'
+        ref: 'Product'
     }
         ]
 });
 
 
 
-module.exports= mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);

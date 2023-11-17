@@ -1,9 +1,10 @@
 const express = require('express');
-const crypto = require('crypto')
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose')
 require('dotenv').config();
 const authRoute = require('./routes/auth')
+const categoryRoute = require('./routes/category')
+const creatorRoute = require('./routes/creator')
 
 
 const app = express()
@@ -21,6 +22,8 @@ app.use( (req, res, next) => {
 
 
 app.use('/auth',authRoute);
+app.use(categoryRoute);
+app.use(creatorRoute);
 
 
 app.use((error, req, res, next) =>{
