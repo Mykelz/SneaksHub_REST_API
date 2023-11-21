@@ -34,10 +34,6 @@ const userSchema = new Schema({
     token:{
         type: String,
     },
-    isShopOwner: {
-        type: Boolean,
-        default: false
-    },
     isAdmin: {
         type: Boolean,
         default: false

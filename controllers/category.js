@@ -1,8 +1,16 @@
 const Category = require('../models/category');
 const  User = require('../models/auth');
-
+const { ValidationResult } = require('express-validator'); 
 
 exports.addCategory = (req, res, next) =>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Please enter valid Category deatils");
+      error.data = errors.array();
+      error.statusCode = 422;
+      throw error;
+    }
+
     User.findById(req.userId)
         .then(user=>{
             if(user.isAdmin !== true){
@@ -47,6 +55,14 @@ exports.getAllCategory = (req, res, next) =>{
 
 
 exports.updateCategory = (req, res, next) =>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Please enter valid Category details");
+      error.data = errors.array();
+      error.statusCode = 422;
+      throw error;
+    }
+
     const categoryId = req.params.categoryId;
 
     const title = req.body.title;

@@ -2,9 +2,18 @@ const Product = require('../models/product');
 const User = require('../models/auth');
 const Category = require('../models/category');
 
+const { validationResult } = require('express-validator')
 
 
 exports.postAddProduct = (req, res, next) =>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Please enter valid product details");
+      error.data = errors.array();
+      error.statusCode = 422;
+      throw error;
+    }
+
     const categoryId = req.params.categoryId;
     const title = req.body.title;
     const price = req.body.price;
@@ -47,14 +56,74 @@ exports.postAddProduct = (req, res, next) =>{
     })
 }
 
-// exports.getShop = (req, res, next) =>{
-    
-// }
+exports.getShop = async (req, res, next) =>{
+    try{
+        const user = await User.findById(req.userId)
+        const userObj = await user.populate('shop', 'title price description')
+        res.status(200).json({
+                    products: userObj.shop, productName: userObj.shop.title
+                })
+    }
+    catch(err){
+        if(!err.statusCode){
+            err.statusCode = 500
+        }
+        next(err);
+    }
+}
 
-// exports.editProduct = (req, res, next) =>{
+exports.editProduct = async (req, res, next) =>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Please enter valid product details");
+      error.data = errors.array();
+      error.statusCode = 422;
+      throw error;
+    }
 
-// }
+    const productId = req.params.productId;
+    const updatedTitle = req.body.title;
+    const updatedPrice = req.body.price;
+    const updatedDescription = req.body.description;
 
-// exports.deleteProduct = (req, res, next) =>{
+    try {
+        const product = await Product.findById(productId)
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.description = updatedDescription;
+        
+        const updatedProduct = await product.save();
+        res.status(200).json({
+            updatedProduct: updatedProduct
+        })
+    }
+    catch(err){
+        if(!err.statusCode){
+            err.statusCode = 500
+        }
+        next(err)
+    }
+}
 
-// }
+
+exports.deleteProduct = async (req, res, next) =>{
+    const productId = req.params.productId;
+
+    try{
+        const deletedProduct = await Product.findByIdAndDelete(productId);
+        const categoryId = deletedProduct.category;
+        await Category.updateOne({ _id: categoryId}, {$pull: { products: productId}})
+        await User.updateOne({ _id: req.userId}, {$pull: { shop: productId}})
+
+        res.status(200).json({
+            msg: 'Product deleted successfully'
+        })
+    }
+    catch(err){
+        if(!err.statusCode){
+            err.statusCode = 500;
+        }
+        next(err)
+    }
+
+}
