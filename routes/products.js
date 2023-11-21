@@ -1,13 +1,11 @@
 const express = require('express');
 
+const productController = require('../controllers/product');
+
 const router = express.Router();
 
 
-router.get('/:catName');
-
-router.get('/:catName/:productId');
-
-
+router.get('/product/:productId', productController.getProduct);
 
 
 

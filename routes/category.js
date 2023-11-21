@@ -16,7 +16,7 @@ router.post('/category', [
     .trim().not().isEmpty().withMessage('please Enter Category Description')
 ], isAuth, categoryController.addCategory)
 
-router.get('/category', isAuth, categoryController.getAllCategory);
+router.get('/category', categoryController.getAllCategory);
 
 router.put('/category', [
     body('title')
@@ -26,6 +26,6 @@ router.put('/category', [
 
 ], isAuth, categoryController.updateCategory);
 
-
+router.get('/category/:categoryId/products', categoryController.displayProductsByCategory)
 
 module.exports = router;

@@ -81,3 +81,25 @@ exports.updateCategory = (req, res, next) =>{
                next(err)
         })
 }
+
+exports.displayProductsByCategory = async (req, res, next) =>{
+    const categoryId = req.params.categoryId;
+
+    try{
+        const category = await Category.findById(categoryId);
+        const products = await category.populate('products');
+        console.log(products);
+        res.status(200).json({
+            
+            categoryTitle: products.title, categoryId: products._id, products: products.products
+        })
+    }
+    catch(err){
+        if(!err.statusCode){
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+
+}
+

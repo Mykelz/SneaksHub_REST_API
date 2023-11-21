@@ -59,7 +59,8 @@ exports.postAddProduct = (req, res, next) =>{
 exports.getShop = async (req, res, next) =>{
     try{
         const user = await User.findById(req.userId)
-        const userObj = await user.populate('shop', 'title price description')
+        const userObj = await user.populate('shop', 'title price description category')
+        console.log(userObj)
         res.status(200).json({
                     products: userObj.shop, productName: userObj.shop.title
                 })
@@ -80,6 +81,7 @@ exports.editProduct = async (req, res, next) =>{
       error.statusCode = 422;
       throw error;
     }
+
 
     const productId = req.params.productId;
     const updatedTitle = req.body.title;
