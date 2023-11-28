@@ -1,5 +1,6 @@
 const Product = require('../models/product');
-const User = require('../models/auth')
+const User = require('../models/auth');
+const Order = require('../models/order');
 
 exports.getProduct = async( req, res, next) =>{
     const productId = req.params.productId;
@@ -87,4 +88,38 @@ exports.deleteCart = async (req, res, next) =>{
         console.log(err)
     }
     
+}
+
+exports.postOrder = async (req, res, next) =>{
+    try{
+        const user = await User.findById(req.userId);
+        const cartItems = await user.populate('cart.items.productId')
+        const products = user.cart.items.map( i =>{
+            return { quantity: i.quantity, product: { ...i.productId._doc } }
+          })
+        if (products.length <= 0){
+            const error = new Error('Please add some product(s) to cart before making an order');
+            error.statusCode = 400;
+            throw error;
+        }
+        const order = new Order({
+            user: {
+                email: user.email,
+                userId: req.userId
+            },
+            products: products
+        })
+        await order.save();
+        await user.clearCart();
+
+        res.status(200).json({
+            msg: 'order saved'
+        })
+    }catch(err){
+        if (!err.statusCode){
+            err.statusCode = 500;
+        }
+        console.log(err)
+        next(err)
+    }
 }
