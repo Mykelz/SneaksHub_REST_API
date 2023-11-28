@@ -1,6 +1,5 @@
 const Product = require('../models/product');
 const User = require('../models/auth');
-const Order = require('../models/order');
 
 exports.getProduct = async( req, res, next) =>{
     const productId = req.params.productId;
@@ -122,4 +121,16 @@ exports.postOrder = async (req, res, next) =>{
         console.log(err)
         next(err)
     }
+}
+
+exports.getOrders =async (req, res, next) =>{
+    const order = await Order.find({'user.userId': req.userId });
+    if (!order){
+        const error = new Error('You have not made any order');
+        error.statusCode = 401
+        throw error;
+    }
+    res.status(200).json({
+        order: order
+    })
 }

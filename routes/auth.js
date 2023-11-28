@@ -35,6 +35,7 @@ router.post('/signup',[
     })
     .normalizeEmail(),
     body('password').trim().escape().isLength({min: 7}).withMessage('Please enter a stronger password'),
+    body('confirmPassword').trim().escape().isLength({min: 7}).withMessage('Please enter a stronger password'),
     body('phoneNum').isMobilePhone('en-NG').withMessage('Please enter a valid phone number')
 
 

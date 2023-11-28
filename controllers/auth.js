@@ -22,6 +22,7 @@ exports.signup = (req, res, next) => {
     error.data = errors.array();
     error.statusCode = 422;
     throw error;
+    console.log(error)
   }
 
   const firstname = req.body.firstname;
@@ -29,8 +30,14 @@ exports.signup = (req, res, next) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword
   const phoneNum = req.body.phoneNum;
 
+  if (password !== confirmPassword){
+    const error = new Error('Passwords do not match');
+    error.statusCode = 400;
+    throw error
+  }
   const token = crypto.randomBytes(6, (err, buffer) => {
       if (err) {
         const error = new Error("An error occured!");
@@ -72,6 +79,7 @@ exports.signup = (req, res, next) => {
           err.statusCode = 500;
         }
           next(err)
+          console.log(err)
       })
     })
 };

@@ -17,7 +17,8 @@ const orderSchema = new Schema({
             required: true,
             ref: 'User'
         }
-    } 
+    } ,
+    status: { type: String, default: 'pending'}
 })
 
 module.exports = mongoose.model('Order', orderSchema)
