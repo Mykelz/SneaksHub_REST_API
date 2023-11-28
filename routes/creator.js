@@ -13,7 +13,7 @@ router.post('/add-product/:categoryId', [
     body('price')
     .trim().not().isEmpty().withMessage('please Enter product price'),
     body('description')
-    .trim().not().isEmpty().isLength({min: 20, max: 150}).withMessage('please Enter product description')
+    .trim().not().isEmpty().isLength({min: 15, max: 150}).withMessage('please Enter product description with a min length of 15 and max length of 150')
 ], isAuth, creatorController.postAddProduct);
 
 router.get('/Shop', isAuth, creatorController.getShop);

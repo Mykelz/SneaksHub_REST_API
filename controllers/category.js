@@ -68,11 +68,19 @@ exports.updateCategory = (req, res, next) =>{
     const title = req.body.title;
     const description = req.body.description;
 
-    Category.findByIdAndUpdate(categoryId)
-        .then(updtCategory=>{
-            updtCategory.title = title;
-            updtCategory.description = description
-            res.status(200).json({ updatedCategory: updtCategory})
+    User.findById(req.userId)
+        .then(user=>{
+            if (user.isAdmin !== true){
+                const error = new Error('Only Admins are permitted to access this route')
+                error.statusCode = 500;
+                throw error;
+            }
+            Category.findByIdAndUpdate(categoryId)
+                .then(updtCategory=>{
+                    updtCategory.title = title;
+                    updtCategory.description = description
+                    res.status(200).json({ updatedCategory: updtCategory})
+                    })
         })
         .catch(err =>{
             if (!err.statusCode){
@@ -86,12 +94,12 @@ exports.displayProductsByCategory = async (req, res, next) =>{
     const categoryId = req.params.categoryId;
 
     try{
-        const category = await Category.findById(categoryId);
-        const products = await category.populate('products');
+        const getCategory = await Category.findById(categoryId);
+        const category = await getCategory.populate('products');
         console.log(products);
         res.status(200).json({
             
-            categoryTitle: products.title, categoryId: products._id, products: products.products
+            categoryTitle: category.title, categoryId: category._id, products: category.products
         })
     }
     catch(err){
