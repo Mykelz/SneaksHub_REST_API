@@ -31,9 +31,8 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    token:{
-        type: String,
-    },
+    token: String,
+    tokenExpiration: Date,
     isAdmin: {
         type: Boolean,
         default: false
