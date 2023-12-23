@@ -16,7 +16,7 @@ ___
 * **Receipts Generator** - After every purchase a downloadable receipt would be generated containing all the details of the purchased item.
 * **Image Uploads (with multer)** - Sellers can upload images if their products.
 * **JWT Authentication** - Registered users will be authenticated using **jwt** before they can be granted access to their accounts.
-* **Email Sending** - Emails will be sent out at different stages wehn using this API using the mailgun API.
+* **Email Sending** - Emails will be sent out at different stages in this application using the mailgun API.
      * **email confirmation** - after registration a confirmation email with a unique link will be sent to the email provided during registration. The user is required to click the unique link to confirm their email.
      * **Welcome message** - A welcome message will be sent out to users after they successfully confrim their email.
      * **Payments** - An email will be sent upon successfull funding of wallets
