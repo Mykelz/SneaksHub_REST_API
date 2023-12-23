@@ -1,5 +1,5 @@
 # Ecommerce-REST API
-Welcome to this e-commerce API documentation. This API can serve as the backend for your E-commerce platform, Allowing you to register, signIn, create dispand manage your products for Intending customers.
+Welcome to this e-commerce API documentation. This API can serve as the backend for your E-commerce platform, Allowing users to register, signIn, create and manage products for Intending customers.
 Whether you're a developer integrating our API into your application or a curious user wanting to understand the technical aspects, this readme will guide you through the process.
 
 ___
