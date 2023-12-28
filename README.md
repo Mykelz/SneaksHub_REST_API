@@ -1,11 +1,11 @@
-# Ecommerce-REST API
-Welcome to this e-commerce API documentation. This API can serve as the backend for your E-commerce platform, Allowing users to register, signIn, create and manage products for Intending customers.
+# **SneaksHub** Ecommerce-REST API
+Welcome to **SneaksHub** API documentation. This API can serve as the backend for your sneakers/footwares E-commerce platform, Allowing users to register, signIn, create and manage products for Intending customers.
 Whether you're a developer integrating our API into your application or a curious user wanting to understand the technical aspects, this readme will guide you through the process.
 
 ___
 
 ### Introduction
-This API will provide the basic tools for an E-commerce platform to manage, create and interact with intending buyers, intending sellers and their various products in an efficient manner.
+This API will provide the basic tools for sneakers/footwares E-commerce platform to manage, create and interact with intending buyers, sellers and their various products in an efficient manner.
 Allowing sellers to create and manage their different produtcs, and buyers to view and purchase these products seamlessly. This API aims to simplify the E-commerce experience for its various users.
 
 ___
@@ -28,7 +28,7 @@ ___
 ___
 
 ### Getting Started
-To start using the E-commerce API, follow these steps:
+To start using the **SneaksHub** E-commerce API, follow these steps:
 
 1. Sign Up: Create an account on our platform to obtain API credentials.
 1. Authentication: Acquire a token to authenticate your requests.
