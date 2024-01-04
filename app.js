@@ -5,11 +5,10 @@ require('dotenv').config();
 
 const authRoute = require('./routes/auth');
 const categoryRoute = require('./routes/category');
-const creatorRoute = require('./routes/creator');
+const shopRoute = require('./routes/Shop');
 const productRoute = require('./routes/products');
 
 const app = express()
-
 
 app.use(bodyParser.json())
 
@@ -20,15 +19,12 @@ app.use( (req, res, next) => {
   next();
 });
 
-
-
 app.use('/auth',authRoute);
 app.use(productRoute);
 app.use(categoryRoute);
-app.use(creatorRoute);
+app.use(shopRoute);
 
-
-
+app.use('/uploads', express.static('uploads'));
 app.use((error, req, res, next) =>{
   const data = error.data;
   const status = error.statusCode || 500;

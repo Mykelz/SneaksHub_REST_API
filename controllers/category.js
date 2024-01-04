@@ -1,11 +1,11 @@
 const Category = require('../models/category');
 const  User = require('../models/auth');
-const { ValidationResult } = require('express-validator'); 
+const { validationResult } = require('express-validator'); 
 
 exports.addCategory = (req, res, next) =>{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Please enter valid Category deatils");
+      const error = new Error("Please enter valid Category details");
       error.data = errors.array();
       error.statusCode = 422;
       throw error;
@@ -79,8 +79,12 @@ exports.updateCategory = (req, res, next) =>{
                 .then(updtCategory=>{
                     updtCategory.title = title;
                     updtCategory.description = description
-                    res.status(200).json({ updatedCategory: updtCategory})
+                    return updtCategory.save()
+                        .then(result=>{
+                            res.status(200).json({ updatedCategory: updtCategory})
                     })
+                    })
+                
         })
         .catch(err =>{
             if (!err.statusCode){

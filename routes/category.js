@@ -18,7 +18,7 @@ router.post('/category', [
 
 router.get('/category', categoryController.getAllCategory);
 
-router.put('/category', [
+router.put('/category/:categoryId',[
     body('title')
     .trim().not().isEmpty().withMessage('please Enter Category title'),
     body('description')

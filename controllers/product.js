@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const User = require('../models/auth');
+const Order = require('../models/order');
 
 exports.getProduct = async( req, res, next) =>{
     const productId = req.params.productId;

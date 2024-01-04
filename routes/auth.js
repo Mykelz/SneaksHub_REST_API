@@ -7,6 +7,7 @@ const authController = require('../controllers/auth');
 const router = express.Router()
 
 
+// POST/auth/signup
 router.post('/signup',[
     body('firstname')
     .trim().not().isEmpty().withMessage('please Enter your first name'),
@@ -42,14 +43,19 @@ router.post('/signup',[
 
 ], authController.signup)
 
+// GET/auth/emailConf/:token
 router.get('/emailConf/:token', authController.emailConf)
 
+// POST/auth/login
 router.post('/login', authController.login)
 
+// POST/auth/reset-password
 router.post('/reset-password', authController.resetPassword);
 
+// GET/auth/new-password/:token
 router.get('/new-password/:token', authController.getNewPassword);
 
+// POST/auth/new-password/:token
 router.post('/new-password/:token', authController.postNewPassword);
 
 

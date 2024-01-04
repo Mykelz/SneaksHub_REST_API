@@ -147,7 +147,7 @@ exports.login = (req, res, next) => {
         'averytopsecretsecret',
         { expiresIn: '1hr'}
       );
-      res.status(200).json({ token: token, msg: 'you are logged in'})
+      res.status(200).json({ token: 'Bearer ' + token, msg: 'you are logged in'})
     })
     .catch(err=>{
       if (!err.statusCode){
