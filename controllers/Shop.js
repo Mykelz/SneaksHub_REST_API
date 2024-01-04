@@ -19,20 +19,28 @@ exports.postAddProduct = (req, res, next)=>{
     const title = req.body.title;
     const price = req.body.price;
     const description = req.body.description;
-    const image = req.file;
-    if (!req.file){
-        console.log("No file received");
-        return res.json({ message:  "No file received" })
-    }
+    const images = req.files
 
+    if (!images){
+        console.log("No file received");
+        const error = new Error('No file received');
+        throw error;
+    }
+    imageUrl = images.map( i =>{
+        return i.path
+    })
     const product = new Product ({
         title: title,
         price: price,
         description: description,
         category: categoryId,
-        creator: req.userId
+        creator: req.userId,
+        imageUrl: imageUrl
+
     });
-    console.log(image)
+    console.log(images.map( i =>{
+        return i.path
+    }))
     product.save().then(product=>{
         User.findById(req.userId)
             .then(user =>{

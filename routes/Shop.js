@@ -7,7 +7,6 @@ const path = require('path')
 
 const storage = multer.diskStorage({
     destination: ( req, file, cb) => {
-      console.log(file)
       cb(null, 'images/')
     },
 
@@ -24,13 +23,13 @@ const storage = multer.diskStorage({
     }
   }
 
-const upload = multer({ storage: storage, fileFilter: fileFilter })
+const upload = multer({ storage: storage, fileFilter: fileFilter, limits: { fileSize: 1 * 1024 * 1024 } })
 
 
 const router = express.Router();
 
 
-router.post('/add-product/:categoryId', upload.single('image'), isAuth, [
+router.post('/add-product/:categoryId', upload.array('images', 4), isAuth, [
     body('title')
     .trim().not().isEmpty().isLength({min: 3, max: 25}).withMessage('please Enter product title'),
     body('price')
