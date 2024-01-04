@@ -92,16 +92,21 @@ exports.deleteCart = async (req, res, next) =>{
 
 exports.postOrder = async (req, res, next) =>{
     try{
+        // gets the id of the logged in user
         const user = await User.findById(req.userId);
+        // populates the cart items of the logged in user
         const cartItems = await user.populate('cart.items.productId')
+        // the map function creates a new array of products and quantity existing in the cart and stores it in the products const
         const products = user.cart.items.map( i =>{
             return { quantity: i.quantity, product: { ...i.productId._doc } }
           })
+        // this statement checks if there is product(s) in the cart and throws an error if there is not
         if (products.length <= 0){
             const error = new Error('Please add some product(s) to cart before making an order');
             error.statusCode = 400;
             throw error;
         }
+        // create and saves the new order
         const order = new Order({
             user: {
                 email: user.email,

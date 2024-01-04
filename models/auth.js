@@ -62,14 +62,17 @@ const userSchema = new Schema({
     }
 });
 
-
-
+// this function finds the index of the product that is being added to the cart
 userSchema.methods.addToCart = function(product){
     const cartProductIndex = this.cart.items.findIndex( cp =>{
        return cp.productId.toString() === product._id.toString()
     })
     let newQuantity = 1;
+// stores all properties of the existing cart items inside the "updatedCartItems" const
     const updatedCartItems = [ ...this.cart.items]
+
+// Checks if the cartProductIndex returns a negative or postive value
+// positive value means product being added is already on the cart negative value means product isnt in the cart
     if (cartProductIndex >= 0){
         newQuantity = this.cart.items[cartProductIndex].quantity + 1;
         updatedCartItems[cartProductIndex].quantity = newQuantity;
@@ -79,6 +82,7 @@ userSchema.methods.addToCart = function(product){
             quantity: newQuantity
         });
     }
+// stores and save the updatedCartItems into the updatedCart
     const updatedCart = {
         items: updatedCartItems
     };
@@ -86,7 +90,7 @@ userSchema.methods.addToCart = function(product){
      return this.save();
 };
 
-
+// This method allows a user to remove a particular item from cart
 userSchema.methods.removeFromCart = function(productId){
     const updatedCartItems = this.cart.items.filter(item => {
         return item.productId.toString() !== productId.toString();
@@ -95,6 +99,7 @@ userSchema.methods.removeFromCart = function(productId){
     return this.save();
 }
 
+// This method clears all items in a cart
 userSchema.methods.clearCart = function() {
     this.cart = { items: [] };
     return this.save();
