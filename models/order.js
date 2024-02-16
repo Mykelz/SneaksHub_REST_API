@@ -12,9 +12,22 @@ const orderSchema = new Schema({
         quantity: {
              type: Number,
               required: true
-            } 
+            },
+            productPrice: {
+                type: Number,
+                required: true
+            },
+            totalProductPrice: {
+                type: Number,
+                required: true
+            }
          }
     ],
+
+    totalPrice: {
+        type: Number,
+        required: true
+    },
 
     user: {
         email: {
@@ -30,6 +43,10 @@ const orderSchema = new Schema({
     status: { 
         type: String,
         default: 'pending'
+    },
+    paystack_ref: {
+        type: String,
+        default: ''
     }
 })
 

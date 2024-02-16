@@ -97,10 +97,12 @@ exports.updateCategory = (req, res, next) =>{
 exports.displayProductsByCategory = async (req, res, next) =>{
     const categoryId = req.params.categoryId;
 
+    const ITEMS_PER_PAGE = 4;
+    const page = req.query.page;
+
     try{
         const getCategory = await Category.findById(categoryId);
-        const category = await getCategory.populate('products');
-        console.log(products);
+        const category = await getCategory.populate({path: 'products', options: {perDocumentLimit: 1}});
         res.status(200).json({
             
             categoryTitle: category.title, categoryId: category._id, products: category.products

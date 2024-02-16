@@ -53,38 +53,72 @@ const userSchema = new Schema({
                 ref: 'Product',
                 required: true
             },
+            productPrice : {
+                type: Number,
+                required: true
+            },
             quantity: {
+                type: Number,
+                required: true
+            },
+            totalProductPrice: {
                 type: Number,
                 required: true
             }
            }
-        ]
+        ],
+        totalPrice: {
+            type: Number,
+            required: true
+        }
     }
 });
 
-// this function finds the index of the product that is being added to the cart
+// this function finds the index of the product that is being added to the cart 
+// ( returns a negative value if product being added desnt already exist in the cart)
+
 userSchema.methods.addToCart = function(product){
     const cartProductIndex = this.cart.items.findIndex( cp =>{
        return cp.productId.toString() === product._id.toString()
+       
     })
+    const cartLength = this.cart.items.length;
     let newQuantity = 1;
+    let productPrice = 0;
+    let totalProductPrice = 0;
+    let totalPrice = 0;
+
 // stores all properties of the existing cart items inside the "updatedCartItems" const
     const updatedCartItems = [ ...this.cart.items]
 
 // Checks if the cartProductIndex returns a negative or postive value
 // positive value means product being added is already on the cart negative value means product isnt in the cart
     if (cartProductIndex >= 0){
+
         newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+        productPrice = this.cart.items[cartProductIndex].productPrice;
+        totalProductPrice = this.cart.items[cartProductIndex].productPrice * newQuantity;
         updatedCartItems[cartProductIndex].quantity = newQuantity;
+        updatedCartItems[cartProductIndex].productPrice = productPrice;
+        updatedCartItems[cartProductIndex].totalProductPrice = totalProductPrice;
+
     }else{
         updatedCartItems.push({
             productId: product._id,
-            quantity: newQuantity
+            quantity: newQuantity,
+            productPrice: product.price,
+            totalProductPrice: product.price * newQuantity,
+
         });
+    }
+
+    for ( let i = 0; i < updatedCartItems.length; i++){
+        totalPrice += updatedCartItems[i].totalProductPrice
     }
 // stores and save the updatedCartItems into the updatedCart
     const updatedCart = {
-        items: updatedCartItems
+        items: updatedCartItems,
+        totalPrice: totalPrice
     };
     this.cart = updatedCart;
      return this.save();
@@ -101,7 +135,7 @@ userSchema.methods.removeFromCart = function(productId){
 
 // This method clears all items in a cart
 userSchema.methods.clearCart = function() {
-    this.cart = { items: [] };
+    this.cart = { items: [], totalPrice: 0};
     return this.save();
   };
 

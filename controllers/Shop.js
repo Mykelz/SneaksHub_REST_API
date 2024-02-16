@@ -71,12 +71,15 @@ exports.postAddProduct = (req, res, next)=>{
 }
 
 exports.getShop = async (req, res, next) =>{
+
     try{
         const user = await User.findById(req.userId)
         const userObj = await user.populate('shop', 'title price description category')
-        console.log(userObj)
+                                    
+        const products = userObj.shop;
+     
         res.status(200).json({
-                    products: userObj.shop
+                    products: products
                 })
     }
     catch(err){

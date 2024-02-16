@@ -118,8 +118,11 @@ exports.emailConf = (req, res, next) =>{
 
 
 exports.login = (req, res, next) => {
-  const email = req.body.email;
+  let email = req.body.email;
   const password = req.body.password;
+
+  email = email.toLowerCase();
+
   let loadedUser;
   User.findOne({ email: email })
     .then(user=>{
@@ -133,6 +136,7 @@ exports.login = (req, res, next) => {
         error.statusCode = 401;
         throw error;
       }
+      console.log(email);
       loadedUser = user;
       return bcrypt.compare(password, user.password);
     })
