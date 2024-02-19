@@ -177,61 +177,62 @@ exports.checkout = async (req, res, next) =>{
 
 
 exports.orderNow = async ( req, res, next)=>{
-    const orderId = req.params.orderId;
-    const order = Order.findById(orderId);
+    
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId);
 
-    try{
+        const amount = order.totalPrice;
+        const email = order.user.email;
+
         const params = JSON.stringify({
-            "email": `${order.user.email}`,
-            "amount": `${order.totalPrice}` * 100
+          "email": email,
+          "amount": amount * 100
         })
-    
+
         const options = {
-            hostname: 'api.paystack.co',
-            port: 443,
-            path: '/transaction/initialize',
-            method: 'POST',
-            headers: {
-                Authorization: process.env.PAYSTACK_SECRET_KEY,
-                'Content-Type': 'application/json'
-            }
+          hostname: 'api.paystack.co',
+          port: 443,
+          path: '/transaction/initialize',
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+            'Content-Type': 'application/json'
+          }
         }
-    
-        const req = https.request(options, res => {
-        let data = ''
-    
-        res.on('data', (chunk) => {
+        // client request to paystack API
+        const clientReq = https.request(options, apiRes => {
+          let data = ''
+          apiRes.on('data', (chunk) => {
             data += chunk
-        });
-    
-        res.on('end', () => {
+          });
+          apiRes.on('end', () => {
             console.log(JSON.parse(data));
-            return res.status(200).json(data)
-        })
+            return res.status(200).json(data);
+          })
         }).on('error', error => {
-            console.error(error)
+          console.error(error)
         })
-    
-        req.write(params)
-        req.end()
-    }catch(err){
-        if (!err.statusCode){
-            err.statusCode = 500;
-        }
-        next(err)
-    }
+        clientReq.write(params)
+        clientReq.end()
+        
+      } catch (error) {
+        // Handle any errors that occur during the request
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred' });
+      }
+
 }
 
 exports.verifyTrans = async (req, res, next) =>{
 
-    const orderId = req.params.orderId;
-    const order = await Order.findById(orderId);
+    const paystack_ref = req.params.paystack_ref;
 
     try {
         const options = {
           hostname: 'api.paystack.co',
           port: 443,
-          path: `/transaction/verify/${order.paystack_ref}`,
+          path: `/transaction/verify/${paystack_ref}`,
           method: 'GET',
           headers: {
             Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`

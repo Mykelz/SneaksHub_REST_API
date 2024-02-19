@@ -21,7 +21,7 @@ router.post('/checkout', isAuth, productController.checkout);
 
 router.post('/order/:orderId', isAuth, productController.orderNow);
 
-router.get('/verifyPayment/:orderId', isAuth, productController.verifyTrans);
+router.get('/verifyPayment/:paystack_ref', isAuth, productController.verifyTrans);
 
 router.get('/orders', isAuth, productController.getOrders)
 
