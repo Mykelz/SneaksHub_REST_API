@@ -4,7 +4,6 @@ const Order = require('../models/order');
 const https = require('https')
 require('dotenv').config();
 
-const Paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY)
 
 exports.getProdcts = async( req, res, next) =>{
     const ITEMS_PER_PAGE = 4;
@@ -28,23 +27,24 @@ exports.getProdcts = async( req, res, next) =>{
 
 exports.getProduct = async( req, res, next) =>{
     const productId = req.params.productId;
-
     try{
+        let results;
         const product = await Product.findById(productId);
         const creator = await product.populate('creator');
-        const categoryId = product.category;
+        // const categoryId = product.category;
         const category = await product.populate('category');
-        // console.log(product)
-        res.status(200).json({
-            product: {
-                id: product._id,
-                title: product.title,
-                price: product.price,
-                descritption: product.description,
-                SellerPhoneNum: product.creator.phoneNum,
-                categoryName: product.category.title
+
+        results =     {
+            id: product._id,
+            title: product.title,
+            price: product.price,
+            descritption: product.description,
+            SellerPhoneNum: product.creator.phoneNum,
+            categoryName: product.category.title
             }
-        })
+        res.status(200).json(results)
+
+            
     }
     catch(err){
         if(!err.statusCode){

@@ -2,8 +2,18 @@ const Product = require('../models/product');
 const User = require('../models/auth');
 const Category = require('../models/category');
 const { validationResult } = require("express-validator");
+const redis = require('redis');
+let redisClient;
 
 
+(async () => {
+    redisClient = redis.createClient();
+  
+    redisClient.on("error", (error) => console.error(`Error : ${error}`));
+  
+    await redisClient.connect();
+  
+  })();
 
 exports.postAddProduct = (req, res, next)=>{
     const errors = validationResult(req);
@@ -73,14 +83,22 @@ exports.postAddProduct = (req, res, next)=>{
 exports.getShop = async (req, res, next) =>{
 
     try{
-        const user = await User.findById(req.userId)
-        const userObj = await user.populate('shop', 'title price description category')
-                                    
-        const products = userObj.shop;
-     
-        res.status(200).json({
-                    products: products
-                })
+        let products;
+        
+        const prods = await redisClient.get('prods')
+        if (prods){
+            products = JSON.parse(prods);
+            console.log('cache hit')
+            res.status(200).json(products)
+        }else{
+            const user = await User.findById(req.userId)
+            const userObj = await user.populate('shop', 'title price description category')            
+            products = userObj.shop;
+
+            console.log('cache miss');
+            await redisClient.setEx('prods', 3600, JSON.stringify(products));
+            res.status(200).json(products)
+        }        
     }
     catch(err){
         if(!err.statusCode){

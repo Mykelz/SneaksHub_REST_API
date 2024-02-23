@@ -2,6 +2,7 @@ const express = require('express');
 
 const productController = require('../controllers/product');
 const isAuth = require('../middleware/is-Auth');
+const isCached = require('../middleware/cache');
 
 const router = express.Router();
 

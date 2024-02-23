@@ -2,6 +2,19 @@ const Category = require('../models/category');
 const  User = require('../models/auth');
 const { validationResult } = require('express-validator'); 
 
+const redis = require('redis');
+let redisClient;
+
+
+(async () => {
+    redisClient = redis.createClient();
+  
+    redisClient.on("error", (error) => console.error(`Error : ${error}`));
+  
+    await redisClient.connect();
+  
+  })();
+
 exports.addCategory = (req, res, next) =>{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -96,17 +109,22 @@ exports.updateCategory = (req, res, next) =>{
 
 exports.displayProductsByCategory = async (req, res, next) =>{
     const categoryId = req.params.categoryId;
-
-    const ITEMS_PER_PAGE = 4;
-    const page = req.query.page;
+    let products;
 
     try{
-        const getCategory = await Category.findById(categoryId);
-        const category = await getCategory.populate({path: 'products', options: {perDocumentLimit: 1}});
-        res.status(200).json({
-            
-            categoryTitle: category.title, categoryId: category._id, products: category.products
-        })
+        const catProds = await redisClient.get('catProds');
+        if (catProds){
+            products = JSON.parse(catProds);
+            console.log('cache hit');
+            res.status(200).json(products)
+        }else{
+            const getCategory = await Category.findById(categoryId);
+            const category = await getCategory.populate({path: 'products'});
+            console.log('cache miss')
+            products = { categoryTitle: category.title, categoryId: category._id, products: category.products }
+            await redisClient.setEx('catProds', 3600, JSON.stringify(products));
+            res.status(200).json(products)
+        }
     }
     catch(err){
         if(!err.statusCode){
